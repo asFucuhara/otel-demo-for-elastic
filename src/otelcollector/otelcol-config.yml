@@ -88,6 +88,10 @@ receivers:
           static_configs:
             - targets: ['0.0.0.0:8888']
 
+extensions:
+ bearertokenauth/client:
+   token: "0dphZnK03u3IkSEgwK"
+
 exporters:
   debug:
   otlp:
@@ -104,6 +108,10 @@ exporters:
       endpoint: "http://opensearch:9200"
       tls:
         insecure: true
+  otlp/elastic:
+    endpoint: "https://3ae506de7199451db8840667d7783256.apm.us-central1.gcp.cloud.es.io:443"
+    auth:
+      authenticator: bearertokenauth/client
 
 processors:
   batch:
@@ -120,16 +128,17 @@ connectors:
   spanmetrics:
 
 service:
+  extensions: [bearertokenauth/client]
   pipelines:
     traces:
       receivers: [otlp]
       processors: [transform, batch]
-      exporters: [otlp, debug, spanmetrics]
+      exporters: [otlp, debug, spanmetrics, otlp/elastic]
     metrics:
       receivers: [hostmetrics, docker_stats, httpcheck/frontendproxy, otlp, prometheus, redis, spanmetrics]
       processors: [batch]
-      exporters: [otlphttp/prometheus, debug]
+      exporters: [otlphttp/prometheus, debug, otlp/elastic]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [opensearch, debug]
+      exporters: [opensearch, debug, otlp/elastic]
