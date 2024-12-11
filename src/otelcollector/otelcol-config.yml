@@ -79,14 +79,6 @@ receivers:
         mute_process_exe_error: true
         mute_process_io_error: true
         mute_process_user_error: true
-  # Collector metrics
-  prometheus:
-    config:
-      scrape_configs:
-        - job_name: 'otelcol'
-          scrape_interval: 10s
-          static_configs:
-            - targets: ['0.0.0.0:8888']
 
 extensions:
  bearertokenauth/client:
@@ -124,21 +116,18 @@ processors:
           - replace_pattern(name, "\\?.*", "")
           - replace_match(name, "GET /api/products/*", "GET /api/products/{productId}")
 
-connectors:
-  spanmetrics:
-
 service:
   extensions: [bearertokenauth/client]
   pipelines:
     traces:
       receivers: [otlp]
       processors: [transform, batch]
-      exporters: [otlp, debug, spanmetrics, otlp/elastic]
+      exporters: [otlp/elastic]
     metrics:
-      receivers: [hostmetrics, docker_stats, httpcheck/frontendproxy, otlp, prometheus, redis, spanmetrics]
+      receivers: [hostmetrics, docker_stats, httpcheck/frontendproxy, otlp, redis]
       processors: [batch]
-      exporters: [otlphttp/prometheus, debug, otlp/elastic]
+      exporters: [debug, otlp/elastic]
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [opensearch, debug, otlp/elastic]
+      exporters: [debug, otlp/elastic]
