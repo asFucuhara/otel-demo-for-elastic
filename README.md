@@ -1,4 +1,9 @@
 <!-- markdownlint-disable-next-line -->
+This is a fork from open telemetry example, implmentated to work with elastic stack without using elastic custom collector
+
+done:
+  removed extra apm database and monitoring tools from stack
+  adding configuration to work with elatic stack
 
 run with
 ```docker compose up --remove-orphans
@@ -7,7 +12,8 @@ frontend: localhost:8080
 swarm: localhost:8080/loadgen
 
 
-
+todo:
+  add elastic custom colector
 
 
 
